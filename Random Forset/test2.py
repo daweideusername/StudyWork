@@ -1,19 +1,39 @@
+
+
+
+#读取数据
+import pandas as pd
+
+# 读取 Excel 文件的第二个工作表
+df = pd.read_excel('AllData.xlsx', sheet_name=0)
+
+# 打印读取的数据
+print(df)
+
+
+
+
+
+
+
+
+#超参数调优
 from sklearn.model_selection import GridSearchCV
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import accuracy_score
-from sklearn.datasets import load_iris
-
-X, y = load_iris(return_X_y=True)
-
-param_grid = {'max_depth': [2, 4, 6, 8]}
-
-clf = DecisionTreeClassifier()
-
-grid_search = GridSearchCV(clf, param_grid=param_grid, scoring='accuracy', cv=5)
-grid_search.fit(X, y)
-
-print(grid_search.best_params_)
-print(grid_search.best_score_)
+# from sklearn.datasets import load_iris
+#
+# X, y = load_iris(return_X_y=True)
+#
+# param_grid = {'max_depth': [2, 4, 6, 8]}
+#
+# clf = DecisionTreeClassifier()
+#
+# grid_search = GridSearchCV(clf, param_grid=param_grid, scoring='accuracy', cv=5)
+# grid_search.fit(X, y)
+#
+# print(grid_search.best_params_)
+# print(grid_search.best_score_)
 
 
 

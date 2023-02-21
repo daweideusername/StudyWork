@@ -1,30 +1,26 @@
 import numpy as np
 import scipy
-import pandas as pd
+import pandas as pd #读取数据
 from sklearn.ensemble import RandomForestClassifier #随机森林分类器
 from sklearn.tree import DecisionTreeClassifier #决策树分类器 (我暂时不需要)
-
-from sklearn.model_selection import train_test_split,cross_val_score,GridSearchCV
-from sklearn.metrics import roc_curve,auc,roc_auc_score
-
-from sklearn.model_selection import GridSearchCV
-from sklearn.tree import DecisionTreeClassifier
+from sklearn.model_selection import train_test_split,cross_val_score,GridSearchCV #数据分割
+from sklearn.metrics import roc_curve,auc,roc_auc_score #评估标准
 from sklearn.metrics import accuracy_score
 from sklearn.datasets import load_iris
-from sklearn.model_selection import GridSearchCV
+from sklearn.model_selection import GridSearchCV #交叉验证
 from sklearn.metrics import make_scorer, accuracy_score, roc_auc_score
-
-import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt #生成图
 
 # 读取 xlsx 文件
-data = pd.read_excel('AllData.xlsx')
+data = pd.read_excel('AllData.xlsx',sheet_name=0)#第一页源区数据 - 0
 
 category = data['Category']
-category = category.drop(0,axis=0) #删去第一行空白行
+category = category.drop(0,axis=0) #删去第一行空白行 - 0,  0 - x轴
+
 #对某列数据进行分析
 counts = data['Category'].value_counts()
 # print(counts)
-
+#数据映射
 data['Category'] = data['Category'].astype(str).map({'Junggar Basin':1,
                                                      'Tarim Basin':2,
                                                      'North Alxa Plateau':3,
@@ -35,11 +31,11 @@ data['Category'] = data['Category'].astype(str).map({'Junggar Basin':1,
                                                      'eastern Tibetan Plateau':8})
 
 #数据整理:去掉样品源区,去掉经纬度,去掉样品序号
-x = data.drop('Category',axis=1)
+x = data.drop('Category',axis=1) #1 - y轴
 x = x.drop('Longitude',axis=1)
 x = x.drop('Latitude',axis=1)
-x = x.drop('No.',axis=1)
-x = x.drop(0,axis=0) #去掉单位那一行
+x = x.drop('No.',axis=1) #(列)
+x = x.drop(0,axis=0) #去掉单位那一行 (当前的第一行)
 
 # print(x)
 # print(data)
@@ -48,8 +44,9 @@ x = x.drop(0,axis=0) #去掉单位那一行
 #x是清理好后的数据,y是结果数据
 y = category
 seed = 5
-xtrain,xtest,ytrain,ytest = train_test_split(x,y,test_size = 0.4,random_state=seed)#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+xtrain,xtest,ytrain,ytest = train_test_split(x,y,test_size = 0.2,random_state=seed)#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 #这个比例可以调,然后增大正确率
+#训练集0.8,  测试集0.2
 """
 seed = 5 #结果有幅度变化
 0.3 --- 0.7387387387387387
@@ -64,22 +61,14 @@ rfc = rfc.fit(xtrain,ytrain) #用训练集数据训练模型 (接口fit)
 
 result = rfc.score(xtest,ytest) #导入测试集,rfc的接口score计算的是模型的准确率accuracy
 
-print(result) #得出结果 0.7387387387387387
-
+print(result) #得出结果
 print('所有的树:%s' % rfc.estimators_) #显示森林的所有树
 print(rfc.classes_) # 显示类别(物源地)
 print(rfc.n_classes_) # 分类数量
 
 # print('判定结果: %s' % rfc.predict(xtest))
-
 # print('判定结果: %s' % rfc.predict_proba(xtest)[:,:])
 # print('判定结果: %s' % rfc.predict_proba(xtest)[:,0]) #0 1 2 3 4 ...分别是之前定义的物源的可能性
-
-
-
-
-
-
 # print('各特征的重要性 : %s' %rfc.feature_importances_) #重要性
 # importances = rfc.feature_importances_ #对重要性排序
 # print(np.argsort(importances))
@@ -147,3 +136,18 @@ gsearch2 = GridSearchCV(estimator = RandomForestClassifier(n_estimators=350,
 gsearch2.fit(xtrain, ytrain)
 print(gsearch2.best_params_, gsearch2.best_score_)
 
+
+#对黄土数据的读取
+data_LGL = pd.read_excel('AllData.xlsx',sheet_name=1)#第二页源区数据 - 1
+
+data1 = data_LGL.drop('No.',axis=1)#删列
+data1 = data1.drop('Longitude',axis=1)
+data1 = data1.drop('Latitude',axis=1)
+data1 = data1.drop(0,axis=0) #删行
+# print(data1)
+#预测
+
+print('判定结果: %s' % rfc.predict(data1))
+# print('判定结果: %s' % rfc.predict_proba(xtest)[:,:])
+# print('判定结果: %s' % rfc.predict_proba(xtest)[:,0]) #0 1 2 3 4 ...分别是之前定义的物源的可能性
+print("运行完毕")
